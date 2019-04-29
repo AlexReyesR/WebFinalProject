@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<meta charset="UTF-8" />
+<html>
+	<head>
+		<title>
+			< LIST OF SPORTS >
+		</title>
+		<!--<link rel="stylesheet" type="text/css" href="./index.css"/>-->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	</head>
+	<body>
+		<h1>List of sports</h1>
+
+		<form id="formNewSport" class="formSection">
+			<fieldset>
+				<legend>
+					Add new sport
+				</legend>
+
+				<label for="nameInput">
+					<div class="name">
+						Enter name			
+						<input type="text" id="nameInput" class="formElement" value="Name"/>
+					</div>
+				</label>
+
+				<label for = "idInput">
+					<div class = "id">
+						Enter ID
+						<input type="text" id="idInput" class="formElement" value="ID"/>					
+					</div>
+					
+
+				</label>
+
+				<div>				
+					<label for="submitNewSport">
+        				<input type="submit" value="Submit" id="submitNewSport" class="button"/>
+    				</label>
+				</div>
+
+			</fieldset>
+		</form>
+
+		<ul>
+			<div class ="sports-list">
+
+			</div>
+		</ul>
+		<script type="text/javascript" src="./script.js"></script>
+	</body>
+</html>
