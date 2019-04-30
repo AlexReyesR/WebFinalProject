@@ -7,7 +7,7 @@ $(".translate-button").on("click", event => {
 $(".create-user").on("click", event => {
   $("#create-user-box").collapse("toggle");
 });
-
+/*
 let usersDB = [
   {
     username : "admin",
@@ -17,7 +17,39 @@ let usersDB = [
     username : "hdsalazar",
     password : "123456"
   }
-];
+];*/
+let usersDB;
+
+function generateUsersList(data) {
+  usersDB = data.users;
+  console.log(usersDB);
+}
+
+function sendGetUsers() {
+  let url = "//localhost:8081/wenglish/users/list-users";
+  let settings = {
+    method : "GET",
+    mode : "cors",
+    headers : {
+      'Content-Type' : 'application/json'
+    }
+  }
+  console.log("Settings");
+  console.log(settings);
+
+  fetch(url, settings)
+  .then(response => {
+    //all the 200s are going to be "OK"
+    console.log("First then");
+    if (response.ok) {
+      return response.json();
+    }
+    throw new Error(response.statusText);
+  })
+  .then(responseJSON => {
+    generateUsersList(responseJSON);
+  });
+}
 
 function initializeUsers(){
   //Check in session storage if an user is already logged
@@ -26,6 +58,7 @@ function initializeUsers(){
     //Create variable to let know the browser that anyuser is logged
     sessionStorage.UserLogged = false;
     console.log("Creating session storage variable for user logged.");
+    sendGetUsers();
   } else {
     console.log("Session storage variable for user logged has alreade been created.");
   }

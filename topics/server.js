@@ -10,7 +10,7 @@ const jsonParser = bodyParser.json();
 app.use('/wenglish/topics', jsonParser, topicsRouter);
 
 //Loads the index.html file as the main page (when entering to localhst:8080)
-//app.use(express.static('public'));
+app.use(express.static('./../public'));
 
 //We also need to tell to load the database, so we cannot use the app.listen anymore.
 let server;
