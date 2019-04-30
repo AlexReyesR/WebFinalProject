@@ -56,7 +56,7 @@ function closeServer() {
 }
 
 //Creates the DB, in case it doesn't exist
-runServer(8080, "mongodb://localhost/users")
+runServer(8081, "mongodb://localhost/users")
 	.catch(err => console.log(err));
 
 module.exports = {app, runServer, closeServer};
