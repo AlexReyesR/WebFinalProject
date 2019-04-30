@@ -1,7 +1,7 @@
 const express=require('express');
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
-const usersRouter = require('./router')
+const usersRouter = require('./users-router')
 const app = express();
 mongoose.Promise = global.Promise;
 const jsonParser = bodyParser.json();
@@ -10,7 +10,7 @@ const jsonParser = bodyParser.json();
 app.use('/wenglish/users', jsonParser, usersRouter);
 
 //Loads the index.html file as the main page (when entering to localhst:8080)
-app.use(express.static('public'));
+//app.use(express.static('public'));
 
 //We also need to tell to load the database, so we cannot use the app.listen anymore.
 let server;
@@ -25,7 +25,7 @@ function runServer(port, databaseUrl) {
 					}
 					else {
 						server = app.listen(port, () => {
-							console.log("Your app is running in port ", port);
+							console.log("Users server is running in port ", port);
 							resolve();
 						})
 						.on("error", err => {
