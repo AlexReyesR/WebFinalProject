@@ -61,12 +61,14 @@ router.post('/post-user', (req, res, next) => {
 			return next();
 		}
 	}
+	let received_date = req.body.creationDate;
+	let date_parts = received_date.split(" ");
 
 	let userToAdd = {
 		id: req.body.id,
 		email: req.body.email,
 		password: req.body.password,
-		creationDate : req.body.creationDate
+		creationDate : new Date(date_parts[0], date_parts[1] -1, date_parts[2])
 	}
 
 	usersModel.post(userToAdd)

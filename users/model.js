@@ -5,7 +5,7 @@ let userSchema = mongoose.Schema({
 	id : {type : Number, required : true, unique : true},
 	email : {type : String, required : true, unique : true},
 	password : {type : String, required : true},
-	creationDate : {type : String, required : true}
+	creationDate : {type : Date, required : true}
 });
 
 let Users = mongoose.model("Users", userSchema);
