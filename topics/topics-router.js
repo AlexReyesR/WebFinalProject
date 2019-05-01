@@ -2,8 +2,14 @@ const express = require('express');
 const router = express.Router();
 const {topicsModel} = require('./topics-model');
 
+router.all('/*', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
-//Next is added instead of ".send('Finish'), que los vergas no usamos, in order to finish the execution and send only one message"
+//Next is added instead of ".send('Finish'), que los vergas no usamos, in order to finish the
+//execution and send only one message"
 router.get('/list-topics', (req, res, next) => {
 	topicsModel.get()
 		.then( topics => {
