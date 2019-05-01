@@ -412,6 +412,7 @@ function checkIfLogged(){
 //For topics search
 $(".search-topic-btn").on("click", event => {
   event.preventDefault();
+  $("#translation-result").collapse("hide");
   let search_word = $("#search-input").val();
   searchTopics(search_word);
 });
@@ -466,6 +467,9 @@ function showFoundTopics(data) {
     if (i == 0) {
       $("#found-topics-list").html(` <div class="topic-info card mb-4 my-4">
                                       <div class="card-body">
+                                        <span class="hiddenSpan" style="display:none">
+                                            ${data.topics[i].id}
+                                        </span>
                                         <h2 class="card-title">${data.topics[i].name}</h2>
                                         Palabras en este tópico:
                                         <ul class="card-text ">
@@ -481,6 +485,9 @@ function showFoundTopics(data) {
     else {
       $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4">
                                           <div class="card-body">
+                                            <span class="hiddenSpan" style="display:none">
+                                              ${data.topics[i].id}
+                                            </span>
                                             <h2 class="card-title">${data.topics[i].name}</h2>
                                             Palabras en este tópico:
                                             <ul class="card-text">
@@ -496,6 +503,56 @@ function showFoundTopics(data) {
   }
 }
 
+//Only for showing recent topics at first
+function getAllTopics(){
+  let url = "//localhost:8080/wenglish/topics/list-topics/";
+  let settings = {
+    method : "GET",
+    headers : {
+      'Content-Type' : 'application/json'
+    }
+  };
+  fetch(url,settings)
+  .then(response => {
+    if(response.ok){
+      return response.json();
+    } else {
+      throw new Error(response.statusText);
+    }
+  })
+  .then(responseJSON => {
+    showRecentTopics(responseJSON);
+  });
+}
+
+function showRecentTopics(data) {
+  //console.log(data.topics.length);
+  let listed_words;
+  for (let i = data.topics.length - 1; i > data.topics.length - 4; i--) {
+    listed_words = "";
+    for (let j = 0; j < data.topics[i].words.length; j++) {
+      listed_words += ` <li> ${data.topics[i].words[j]} </li>`
+    }
+
+    $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4"> 
+                                        <div class="card-body">
+                                          <span class="hiddenSpan" style="display:none">
+                                            ${data.topics[i].id}
+                                          </span>
+                                          <h2 class="card-title">${data.topics[i].name}</h2>
+                                          Palabras en este tópico:
+                                          <ul class="card-text">
+                                            ${listed_words}
+                                          </ul>
+                                        </div>
+                                        <div class="card-footer text-muted">
+                                          Tópico creado por:
+                                          <span class="topic-author-span"> ${data.topics[i].creatorEmail} </span>
+                                        </div>
+                                      </div>`);
+  }
+}
 
 $(initializeUsers);
 $(checkIfLogged);
+$(getAllTopics);
