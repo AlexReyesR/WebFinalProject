@@ -1,7 +1,44 @@
+const spanishKey = "c47cfc8c-fb4f-4f05-9a5c-8ca50a95ed45";
+const learnerKey="a918126f-e9e9-4916-9b12-53cbcba2e97a";
+const thesaurusKey = "a414d322-2ba5-458e-80a1-8fc3c994dedd";
+
+function showTranslation(data) {
+  $("#translation-result-text").html(data[0].shortdef);
+  $("#translation-result").collapse("show");
+
+  let firstDef = data[0].shortdef[0];
+  firstDef = firstDef.split(" ");
+
+  let translatedText;
+  for (let i = 0; i < firstDef.length; i++) {
+    if (firstDef[i] == ':') {
+      translatedText = firstDef[i + 1];
+      i = firstDef.length;
+    }
+  }
+
+  if(!translatedText) {
+    translatedText = firstDef[0];
+  }
+
+  translatedText = translatedText.replace( /[^a-zA-Z]/ , "");
+  
+  console.log(translatedText);
+}
+
+function findTranslation(wordToTranslate, callback){
+  $.ajax({
+    url : `https://www.dictionaryapi.com/api/v3/references/spanish/json/${wordToTranslate}?key=${spanishKey}`,
+    method : "GET",
+    dataType : "json",
+    success : responseJson => callback(responseJson),
+    error : err => console.log(err)
+  });
+}
+
 $(".translate-button").on("click", event => {
   let translationText = $("#translate-input").val();
-  $("#translation-result-text").html(translationText);
-  $("#translation-result").collapse("toggle");
+  findTranslation(translationText, showTranslation);
 });
 
 $(".create-user").on("click", event => {
