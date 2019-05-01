@@ -1,8 +1,9 @@
 const express = require('express');
+const uuidv4 = require('uuid/v4');
 const router = express.Router();
 const {usersModel} = require('./users-model');
 
-//
+//CORS Permissions
 router.all('/*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -82,7 +83,7 @@ router.get('/login-user/:email&:password', (req, res, next) => {
 });
 
 router.post('/post-user', (req, res, next) => {
-	let requiredFields = ['id', 'email', 'password', 'creationDate'];
+	let requiredFields = ['email', 'password', 'creationDate'];
 
 	for (let i = 0; i < requiredFields.length; i++) {
 		let currentField = requiredFields[i];
@@ -94,14 +95,12 @@ router.post('/post-user', (req, res, next) => {
 			return next();
 		}
 	}
-	let received_date = req.body.creationDate;
-	let date_parts = received_date.split(" ");
 
 	let userToAdd = {
-		id: req.body.id,
+		id: uuidv4(),
 		email: req.body.email,
 		password: req.body.password,
-		creationDate : new Date(date_parts[0], date_parts[1] -1, date_parts[2])
+		creationDate : req.body.creationDate
 	}
 
 	usersModel.post(userToAdd)
@@ -117,6 +116,7 @@ router.post('/post-user', (req, res, next) => {
 				message: "Internal server error",
 				status : 500
 			});
+      console.log(err);
 			return next();
 		});
 });

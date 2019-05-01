@@ -5,8 +5,16 @@
  */
 body {
   padding-top: 56px;
+  padding-bottom: 56px;
+  position: relative;
 }
 
 .translationResultSection {
 	margin-top: 20px;
+}
+
+.footer{
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
