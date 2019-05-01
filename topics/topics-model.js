@@ -31,6 +31,16 @@ const topicsModel = {
 			});
 	},
 
+	get_search : function (search_word) {
+		return Topics.find({$or:[{name : search_word}, {words : search_word}]})
+			.then (topics => {
+				return topics;
+			})
+			.catch (err => {
+				throw new Erro(err);
+			});
+	},
+
 	post : function(newTopic) {
 		return Topics.create(newTopic)
 			.then( topic => {

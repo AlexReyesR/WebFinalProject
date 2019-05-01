@@ -54,6 +54,47 @@ router.get('/list-topics/:id', (req, res, next) => {
 		});
 });
 
+router.get('/search-topics', (req, res, next) => {
+	let requiredFields = ['word'];
+
+	for (let i = 0; i < requiredFields.length; i++) {
+		let currentField = requiredFields[i];
+		if (!(currentField in req.body)) {
+			res.status(406).json({
+				message : `Missing field ${currentField} in body.`,
+				status : 406
+			});
+			return next();
+		}
+	}
+
+	topicsModel.get_search(req.body.word)
+		.then(topics => {
+			if(topics.length > 0) {
+				res.status(200).json({
+					message : "Successfully found topics",
+					status : 200,
+					topics : topics
+				});
+				return next();
+			}
+			else {
+				res.status(404).json({
+					message : "Topics not found",
+					status : 404
+				});
+				return next();
+			}
+		})
+		.catch(err => {
+			res.status(500).json({
+				message: "Internal server error",
+				status : 500
+			});
+			return next();
+		});
+});
+
 router.post('/post-topic', (req, res, next) => {
 	let requiredFields = ['id', 'name', 'words', 'creatorEmail'];
 
