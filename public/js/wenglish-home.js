@@ -7,47 +7,54 @@ $(".translate-button").on("click", event => {
 $(".create-user").on("click", event => {
   $("#create-user-box").collapse("toggle");
 });
-/*
-let usersDB = [
-  {
-    username : "admin",
-    password : "Admin"
-  },
-  {
-    username : "hdsalazar",
-    password : "123456"
-  }
-];*/
+
+$("#user-info-logout").on("click", event => {
+  sessionStorage.UserLogged = false;
+  sessionStorage.Username = null;
+  $("#login-box").show();
+  $("#user-info-box").hide();
+});
+
 let usersDB;
 
-function generateUsersList(data) {
-  usersDB = data.users;
-  console.log(usersDB);
+function replaceLogin(){
+  $("#user-info-email").text(sessionStorage.Username);
+  $("#login-box").hide();
+  $("#user-info-box").show();
 }
 
-function sendGetUsers() {
-  let url = "//localhost:8081/wenglish/users/list-users";
+function loginUserFromJson(data) {
+  //Save in session storage the user logged user email
+  console.log("Loggin in.");
+  sessionStorage.UserLogged = true;
+  sessionStorage.Username = data.userLogged.email;
+  replaceLogin();
+}
+
+function unableToLogin(){
+  console.log("Error in email or password");
+}
+
+function loginRequest(userEmail, userPassword) {
+  let url = `//localhost:8081/wenglish/users/login-user/${userEmail}&${userPassword}`;
   let settings = {
     method : "GET",
-    mode : "cors",
     headers : {
       'Content-Type' : 'application/json'
     }
   }
-  console.log("Settings");
-  console.log(settings);
 
   fetch(url, settings)
   .then(response => {
-    //all the 200s are going to be "OK"
-    console.log("First then");
     if (response.ok) {
       return response.json();
+    } else {
+      unableToLogin();
+      throw new Error(response.statusText);
     }
-    throw new Error(response.statusText);
   })
   .then(responseJSON => {
-    generateUsersList(responseJSON);
+    loginUserFromJson(responseJSON);
   });
 }
 
@@ -60,7 +67,7 @@ function initializeUsers(){
     console.log("Creating session storage variable for user logged.");
     sendGetUsers();
   } else {
-    console.log("Session storage variable for user logged has alreade been created.");
+    console.log("Session storage variable for user logged has already been created.");
   }
 }
 
@@ -72,35 +79,17 @@ function checkIfLogged(){
   if(isUserLogged == true || isUserLogged == "true"){
     console.log(isUserLogged);
     console.log(loggedUsername);
+    replaceLogin();
   } else { //There is no user logged in
     console.log("There is no user logged in.");
   }
 }
 
-function login(user, password){
-  let wasLoginPossible = false;
-  usersDB.forEach(item => {
-    if(item.username == user)
-      if(item.password == password){
-        console.log("Loggin in.");
-        sessionStorage.UserLogged = true;
-        sessionStorage.Username = user;
-        wasLoginPossible = true;
-      }
-  });
-  //No user found or password mismatch
-  if(!wasLoginPossible){
-    sessionStorage.UserLogged = false;
-    sessionStorage.Username = null;
-    console.log("Error in user or password");
-  }
-}
-
 $("#login-box-form").on("submit", event =>{
   event.preventDefault();
-  let user = $("#login-form-inputuser").val();
+  let email = $("#login-form-inputemail").val();
   let pass = $("#login-form-inputpassword").val();
-  login(user,pass);
+  loginRequest(email,pass);
 });
 
 $(initializeUsers);

@@ -31,6 +31,16 @@ const usersModel = {
 			});
 	},
 
+	login_user : function(userEmail, userPassword){
+		return Users.findOne({email: userEmail, password: userPassword})
+		.then(user => {
+			return user;
+		})
+		.catch( err => {
+			throw new Error(err);
+		});
+	},
+
 	post : function(newUser) {
 		return Users.create(newUser)
 			.then( user => {

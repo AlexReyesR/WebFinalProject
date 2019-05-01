@@ -9,8 +9,6 @@ router.all('/*', function(req, res, next) {
   next();
 });
 
-
-//Next is added instead of ".send('Finish'), que los vergas no usamos, in order to finish the execution and send only one message"
 router.get('/list-users', (req, res, next) => {
 	usersModel.get()
 		.then( users => {
@@ -53,6 +51,34 @@ router.get('/list-users/:id', (req, res, next) => {
 			});
 			return next();
 		});
+});
+
+router.get('/login-user/:email&:password', (req, res, next) => {
+  const userEmail = req.params.email;
+  const userPassword = req.params.password;
+
+  usersModel.login_user(userEmail, userPassword)
+  .then( user => {
+    if(user){ //Successful login
+      res.status(200).json({
+        message: "Successful login",
+        status: 200,
+        userLogged: user
+      });
+    } else { //No possible login
+      res.status(404).json({
+        message : "Could not login",
+        status: 404,
+      });
+    }
+  })
+  .catch(err => {
+    res.status(500).json({
+      message: "Internal server error",
+      status : 500
+    });
+    return next();
+  });
 });
 
 router.post('/post-user', (req, res, next) => {
@@ -172,14 +198,14 @@ router.delete('/remove-user/:id', (req, res, next) => {
 							message : "Successfully deleted the user",
 							status : 204,
 						});
-						return next();						
+						return next();
 					}
 					else {
 						res.status(404).json({
 							message : "User not found in the list",
 							status : 404
 						});
-						return next();						
+						return next();
 					}
 				})
 				.catch( err => {

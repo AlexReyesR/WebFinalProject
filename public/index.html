@@ -115,7 +115,7 @@
           <div class="card-body text-right">
             <form id="login-box-form">
               <div class="form-group my-2">
-                <input id="login-form-inputuser" type="text" class="form-control" placeholder="Usuario">
+                <input id="login-form-inputemail" type="text" class="form-control" placeholder="Correo electrónico">
               </div>
               <div class="form-group my-2">
                 <input id="login-form-inputpassword" type="password" class="form-control" placeholder="Contraseña">
@@ -143,6 +143,16 @@
               </div>
               <button type="submit" class="create-user-submit btn btn-success">Crear usuario</button>
             </form>
+          </div>
+        </div>
+
+        <!-- If user is logged show its info -->
+        <div id="user-info-box" class="card my-4" style="display:none;">
+          <h5 id="user-info-email" class="card-header">Información de usuario</h5>
+          <div class="card-body">
+            <div class="card-title"> Titulo de la card </div>
+            <div class="my-2"> Información extra sobre la persona loggeada </div>
+            <button id="user-info-logout" class="btn btn-secondary"> Log out </button>
           </div>
         </div>
 
