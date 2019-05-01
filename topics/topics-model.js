@@ -4,7 +4,7 @@ mongoose.Promise = global.Promise;
 let topicSchema = mongoose.Schema({
 	id : {type : String, required : true, unique : true},
 	name : {type : String, required : true, unique : true},
-	words : {type : [String], required : true},
+	words : {type : [String], required : true, unique : false},
 	creatorEmail : {type : String, required : true}
 });
 

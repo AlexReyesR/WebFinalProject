@@ -55,21 +55,10 @@ router.get('/list-topics/:id', (req, res, next) => {
 		});
 });
 
-router.get('/search-topics', (req, res, next) => {
-	let requiredFields = ['word'];
-
-	for (let i = 0; i < requiredFields.length; i++) {
-		let currentField = requiredFields[i];
-		if (!(currentField in req.body)) {
-			res.status(406).json({
-				message : `Missing field ${currentField} in body.`,
-				status : 406
-			});
-			return next();
-		}
-	}
-
-	topicsModel.get_search(req.body.word)
+router.get('/search-topics/:word', (req, res, next) => {
+	
+	if(req.params.word) {
+		topicsModel.get_search(req.params.word)
 		.then(topics => {
 			if(topics.length > 0) {
 				res.status(200).json({
@@ -94,6 +83,14 @@ router.get('/search-topics', (req, res, next) => {
 			});
 			return next();
 		});
+	}
+	else {
+		res.status(406).json({
+				message : `Missing word in params.`,
+				status : 406
+			});
+	}
+
 });
 
 router.post('/post-topic', (req, res, next) => {
@@ -126,6 +123,7 @@ router.post('/post-topic', (req, res, next) => {
 			});
 		})
 		.catch(err => {
+			console.log(err);
 			res.status(500).json({
 				message: "Internal server error",
 				status : 500
@@ -265,6 +263,7 @@ router.put('/add-word/:id', (req, res, next) => {
 				}
 			})
 			.catch(err => {
+				console.log(err);
 				res.status(500).json({
 					message: "Internal server error",
 					status : 500

@@ -113,7 +113,7 @@ function showTranslation(data) {
 
   translatedText = translatedText.replace( /[^a-zA-Z]/ , "");
 
-  console.log(translatedText);
+  //console.log(translatedText);
 
   findDefinition(translatedText, showDefinition);
 }
@@ -139,8 +139,8 @@ function showDefinition(data, englishWord) {
                                             ${firstDef}
                                           </li>`);
 
-  console.log("Learner definition:");
-  console.log(firstDef);
+  //console.log("Learner definition:");
+  //console.log(firstDef);
 
   findRelatedWords(englishWord, showRelatedWords);
 }
@@ -173,9 +173,6 @@ function showRelatedWords(data) {
                                               ${item}
                                             </li>`);
   })
-
-  console.log("Synonyms:");
-  console.log(firstSyns);
 }
 
 function replaceLogin(){
@@ -408,6 +405,94 @@ function checkIfLogged(){
     console.log("There is no user logged in.");
   }
 }
+
+//For topics search
+$(".search-topic-btn").on("click", event => {
+  event.preventDefault();
+  let search_word = $("#search-input").val();
+  searchTopics(search_word);
+});
+
+function searchTopics(search_word) {
+  let url = `//localhost:8080/wenglish/topics/search-topics/${search_word}`;
+
+  //console.log(`Search word: ${search_word}`);
+  let settings = {
+    method : "GET",
+    headers : {
+      'Content-Type' : 'application/json'
+    }
+  }
+
+  fetch(url, settings)
+    .then(response => {
+      if (response.ok) {
+        //console.log(`Response: ${response}`);
+        return response.json();
+      } else {
+        if (response.statusText == "Not Found") {
+          showNotFoundTopics();
+        }
+        throw new Error(response.statusText);
+      }
+    })
+    .then(responseJSON => {
+      showFoundTopics(responseJSON);
+    });
+}
+
+function showNotFoundTopics() {
+  $("#found-topics-list").html(`<div class="topic-info card mb-4 my-4">
+                                  <div class="card-body">
+                                    <h2 class="card-title">Tópico no encontrado</h2>
+                                    <p class="card-text"> La búsqueda realizada no concuerda con ningún tópico existente. ¡Sé el primero en crearlo!</p>
+                                  </div>
+                                </div>`);
+}
+
+function showFoundTopics(data) {
+
+  console.log(data.topics);
+  let listed_words;
+  for (let i = 0; i < data.topics.length; i++) {
+    listed_words = "";
+    for (let j = 0; j < data.topics[i].words.length; j++) {
+      listed_words += ` <li> ${data.topics[i].words[j]} </li>`
+    }
+
+    if (i == 0) {
+      $("#found-topics-list").html(` <div class="topic-info card mb-4 my-4">
+                                      <div class="card-body">
+                                        <h2 class="card-title">${data.topics[i].name}</h2>
+                                        Palabras en este tópico:
+                                        <ul class="card-text ">
+                                          ${listed_words}
+                                        </ul>
+                                      </div>
+                                      <div class="card-footer text-muted">
+                                        Tópico creado por:
+                                        <span class="topic-author-span"> ${data.topics[i].creatorEmail} </span>
+                                      </div>
+                                    </div>  `);
+    }
+    else {
+      $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4"> 
+                                          <div class="card-body">
+                                            <h2 class="card-title">${data.topics[i].name}</h2>
+                                            Palabras en este tópico:
+                                            <ul class="card-text">
+                                              ${listed_words}
+                                            </ul>
+                                          </div>
+                                          <div class="card-footer text-muted">
+                                            Tópico creado por:
+                                            <span class="topic-author-span"> ${data.topics[i].creatorEmail} </span>
+                                          </div>
+                                        </div>`);
+    }
+  }
+}
+
 
 $(initializeUsers);
 $(checkIfLogged);
