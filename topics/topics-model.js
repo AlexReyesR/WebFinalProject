@@ -4,7 +4,7 @@ mongoose.Promise = global.Promise;
 let topicSchema = mongoose.Schema({
 	id : {type : Number, required : true, unique : true},
 	name : {type : String, required : true, unique : true},
-	words : {type : [String], required : true},
+	words : {type : [String], required : true, unique : true},
 	creatorEmail : {type : String, required : true}
 });
 
@@ -41,13 +41,78 @@ const topicsModel = {
 			});
 	},
 
-	put : function(received_name, received_words) {
-		return Topics.findOneAndUpdate({name : received_name}, {$set : {words : received_words}}, {new : true})
+	put : function(received_id, received_words) {
+		return Topics.findOneAndUpdate({id : received_id}, {$set : {words : received_words}}, {new : true})
 			.then(topic => {
 				return topic;
 			})
 			.catch(err => {
 				throw new Error(err);
+			});
+	},
+
+	change_name : function(received_id, received_name) {
+		return Topics.findOneAndUpdate({id : received_id}, {$set : {name : received_name}}, {new : true})
+			.then(topic => {
+				return topic;
+			})
+			.catch(err => {
+				throw new Error(err);
+			});
+	},
+
+	add_word : function(received_id, received_word) {
+		var words_array = [];
+		return Topics.findOne({id : received_id})
+			.then(topic => {
+				words_array = topic.words;
+				console.log("Original array");
+				console.log(words_array);
+				return words_array;
+			})
+			.then(array => {
+				array.push(received_word);
+				console.log("After adding: ");
+				console.log(array);
+
+				return Topics.findOneAndUpdate({id : received_id}, {$set : {words : array}}, {new : true})
+					.then(topic => {
+						return topic;
+					})
+					.catch(err => {
+						throw new Error(err);
+					});
+			});
+	},
+
+	delete_word : function(received_id, received_word) {
+		var words_array = [];
+		return Topics.findOne({id : received_id})
+			.then(topic => {
+				words_array = topic.words;
+				return words_array;
+			})
+			.then(array => {
+				var found_matches = false;
+				for (let i = 0; i < array.length; i++) {
+					if (array[i] == received_word) {
+						array.splice(i, 1);
+						i-=1;
+						found_matches = true;
+					}
+				}
+
+				if(!found_matches) {
+					throw new Error();
+				}
+
+				return Topics.findOneAndUpdate({id : received_id}, {$set : {words : array}}, {new : true})
+					.then(topic => {
+						return topic;
+					})
+					.catch(err => {
+						throw new Error(err);
+					});
 			});
 	},
 

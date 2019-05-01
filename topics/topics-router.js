@@ -86,11 +86,11 @@ router.post('/post-topic', (req, res, next) => {
 		});
 });
 
-router.put('/update-topic', (req, res, next) => {
-	let received_name = req.body.name;
+router.put('/update-words/:id', (req, res, next) => {
+	let received_id = req.params.id;
 	let received_words = req.body.words;
 
-	let requiredFields = ['name'];
+	let requiredFields = ['words'];
 	for ( let i = 0; i < requiredFields.length; i ++){
 		let currentField = requiredFields[i];
 		if (! (currentField in req.body)){
@@ -102,8 +102,8 @@ router.put('/update-topic', (req, res, next) => {
 		}
 	}
 
-	if (received_name && received_words) {
-		topicsModel.put(received_name, received_words)
+	if (received_id) {
+		topicsModel.put(received_id, received_words)
 			.then( topics => {
 				if (topics) {
 					res.status(200).json({
@@ -134,6 +134,148 @@ router.put('/update-topic', (req, res, next) => {
 				message : `Missing new words in body`,
 				status : 406
 			});
+	}
+});
+
+router.put('/update-name/:id', (req, res, next) => {
+	let received_id = req.params.id;
+
+	let requiredFields = ['name'];
+	for ( let i = 0; i < requiredFields.length; i ++){
+		let currentField = requiredFields[i];
+		if (! (currentField in req.body)){
+			res.status(406).json({
+				message : `Missing field ${currentField} in body.`,
+				status : 406
+			});
+			return next();
+		}
+	}
+
+	if (received_id) {
+		topicsModel.change_name(received_id, req.body.name)
+			.then( topics => {
+				if(topics) {
+					res.status(200).json({
+						message: "Successfully modified the name of topic",
+						status : 200,
+						topics : topics
+					});
+				}
+				else {
+					res.status(404).json({
+						message: "Topic not found in the list",
+						status: 404
+					});
+				}
+			})
+			.catch(err => {
+				res.status(500).json({
+					message: "Internal server error",
+					status : 500
+				});
+				return next();
+			});
+	}
+	else {
+		res.status(406).json({
+			message : `Missing ID parameter`,
+			status : 406
+		});
+	}
+});
+
+router.put('/add-word/:id', (req, res, next) => {
+	let received_id = req.params.id;
+	let requiredFields = ['word'];
+	for ( let i = 0; i < requiredFields.length; i ++){
+		let currentField = requiredFields[i];
+		if (! (currentField in req.body)){
+			res.status(406).json({
+				message : `Missing field ${currentField} in body.`,
+				status : 406
+			});
+			return next();
+		}
+	}
+
+	if (received_id) {
+		topicsModel.add_word(received_id, req.body.word)
+			.then( topics => {
+				if(topics) {
+					res.status(200).json({
+						message: "Successfully added the word to topic",
+						status : 200,
+						topics : topics
+					});
+				}
+				else {
+					res.status(404).json({
+						message: "Topic not found in the list",
+						status: 404
+					});
+				}
+			})
+			.catch(err => {
+				res.status(500).json({
+					message: "Internal server error",
+					status : 500
+				});
+				return next();
+			});
+	}
+	else {
+		res.status(406).json({
+			message : `Missing ID parameter`,
+			status : 406
+		});		
+	}
+});
+
+router.delete('/remove-word/:id', (req, res, next) => {
+	let received_id = req.params.id;
+	let requiredFields = ['word'];
+	for ( let i = 0; i < requiredFields.length; i ++){
+		let currentField = requiredFields[i];
+		if (! (currentField in req.body)){
+			res.status(406).json({
+				message : `Missing field ${currentField} in body.`,
+				status : 406
+			});
+			return next();
+		}
+	}
+
+	if (received_id) {
+		topicsModel.delete_word(received_id, req.body.word)
+			.then( topics => {
+				if(topics) {
+					res.status(200).json({
+						message: "Successfully removed the word from topic",
+						status : 200,
+						topics : topics
+					});
+				}
+				else {
+					res.status(404).json({
+						message: "Topic not found in the list",
+						status: 404
+					});
+				}
+			})
+			.catch(err => {
+				res.status(500).json({
+					message: "Internal server error",
+					status : 500
+				});
+				return next();
+			});
+	}
+	else {
+		res.status(406).json({
+			message : `Missing ID parameter`,
+			status : 406
+		});		
 	}
 });
 
