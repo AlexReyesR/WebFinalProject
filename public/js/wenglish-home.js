@@ -464,6 +464,9 @@ function showFoundTopics(data) {
     if (i == 0) {
       $("#found-topics-list").html(` <div class="topic-info card mb-4 my-4">
                                       <div class="card-body">
+                                        <span class="hiddenSpan" style="display:none">
+                                            ${data.topics[i].id}
+                                        </span>
                                         <h2 class="card-title">${data.topics[i].name}</h2>
                                         Palabras en este tópico:
                                         <ul class="card-text ">
@@ -479,6 +482,9 @@ function showFoundTopics(data) {
     else {
       $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4"> 
                                           <div class="card-body">
+                                            <span class="hiddenSpan" style="display:none">
+                                              ${data.topics[i].id}
+                                            </span>
                                             <h2 class="card-title">${data.topics[i].name}</h2>
                                             Palabras en este tópico:
                                             <ul class="card-text">
@@ -518,7 +524,7 @@ function getAllTopics(){
 
 function showRecentTopics(data) {
   //console.log(data.topics.length);
-    let listed_words;
+  let listed_words;
   for (let i = data.topics.length - 1; i > data.topics.length - 4; i--) {
     listed_words = "";
     for (let j = 0; j < data.topics[i].words.length; j++) {
@@ -527,6 +533,9 @@ function showRecentTopics(data) {
 
     $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4"> 
                                         <div class="card-body">
+                                          <span class="hiddenSpan" style="display:none">
+                                            ${data.topics[i].id}
+                                          </span>
                                           <h2 class="card-title">${data.topics[i].name}</h2>
                                           Palabras en este tópico:
                                           <ul class="card-text">
