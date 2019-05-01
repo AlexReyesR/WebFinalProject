@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 
 let topicSchema = mongoose.Schema({
-	id : {type : Number, required : true, unique : true},
+	id : {type : String, required : true, unique : true},
 	name : {type : String, required : true, unique : true},
-	words : {type : [String], required : true, unique : true},
+	words : {type : [String], required : true},
 	creatorEmail : {type : String, required : true}
 });
 
@@ -47,6 +47,7 @@ const topicsModel = {
 				return topic;
 			})
 			.catch( err => {
+				console.log(err);
 				throw new Error(err);
 			});
 	},

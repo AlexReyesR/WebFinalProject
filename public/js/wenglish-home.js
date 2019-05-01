@@ -32,6 +32,25 @@ $("#creat-user-form").on("submit", event => {
     createUserRequest(email, password);
 });
 
+$("#create-topic-form").on("submit", event=> {
+  event.preventDefault();
+  let topicName = $("#create-topic-topicname").val();
+  let topicWords = $("#create-topic-words").val();
+  let wordsToAdd = stringToWordsArray(topicWords);
+  console.log(wordsToAdd);
+  $("#create-topic-err > .alert").remove();
+
+  if(topicName == "")
+    unableToCreateTopic("nombre");
+  else if(topicWords == "")
+    unableToCreateTopic("palabras");
+  else if(wordsToAdd.length < 1)
+    unableToCreateTopic("errorFormato");
+  else
+    createTopicRequest(topicName, wordsToAdd, sessionStorage.Username);
+
+});
+
 $(".translate-button").on("click", event => {
   let translationText = $("#translate-input").val();
   findTranslation(translationText, showTranslation);
@@ -48,6 +67,13 @@ $("#user-info-logout").on("click", event => {
   $("#user-info-box").hide();
 });
 
+function stringToWordsArray(string){
+  let array = string.split(/[\s,]+/);
+  if(string.search(';') < 0 || string.search('.') < 0 || string.search(':') < 0)
+    return array;
+  return [];
+}
+
 function findTranslation(wordToTranslate, callback){
   $.ajax({
     url : `https://www.dictionaryapi.com/api/v3/references/spanish/json/${wordToTranslate}?key=${spanishKey}`,
@@ -59,7 +85,7 @@ function findTranslation(wordToTranslate, callback){
 }
 
 function showTranslation(data) {
-  $("#translation-result-text").html(`  <div>
+  $("#translation-result-text").html(`  <div class="font-weight-bold">
                                             Traducción(es):
                                           </div>`);
 
@@ -106,7 +132,7 @@ function showDefinition(data, englishWord) {
   let firstDef = data[0].shortdef[0];
   firstDef = firstDef.charAt(0).toUpperCase() + firstDef.slice(1) + ".";
 
-  $("#translation-result-text").append(`  <div class = "translationResultSection">
+  $("#translation-result-text").append(`  <div class = "font-weight-bold translationResultSection">
                                             Definición:
                                           </div>`);
   $("#translation-result-text").append(`  <li>
@@ -138,7 +164,7 @@ function showRelatedWords(data) {
     firstSyns = data;
   }
 
-  $("#translation-result-text").append(`  <div class = "translationResultSection">
+  $("#translation-result-text").append(`  <div class = "font-weight-bold translationResultSection">
                                             Palabras relacionadas:
                                           </div>`);
 
@@ -186,6 +212,55 @@ function unableToLogin(){
   console.log("Error at login.");
 }
 
+function unableToCreateTopic(string){
+  let errorAtCreate = "";
+  if(string == "nombre"){
+    errorAtCreate = `
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <strong>Revisa los campos!</strong> <br/> Por favor llena todos los campos.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`
+  } else if(string =="palabras"){
+    errorAtCreate = `
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <strong>Revisa los campos!</strong> <br/> Por favor escribe al menos una palabra.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`
+  } else if(string =="errorFormato"){
+    errorAtCreate = `
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <strong>Error de formato!</strong> <br/> Por favor separa las palabras con comas únicamente.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`
+  } else if(string =="alreadycreated"){
+    errorAtCreate = `
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <strong>Nombre utilizado!</strong> <br/> Por favor selecciona otro nombre.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`
+  } else if (string == "creado"){
+    errorAtCreate = `
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>Topic creado!</strong> <br/> Topic creado satisfactoriamente.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>`;
+    $("#create-topic-form").trigger('reset');
+  }
+
+  $("#create-topic-err").append(errorAtCreate);
+  console.log(errorAtCreate);
+}
+
 function unableToCreate(string){
   let errorAtCreate = "";
   if(string == "empty"){
@@ -214,7 +289,7 @@ function unableToCreate(string){
     </div>`
   }
   $("#create-user-box > .card-body").prepend(errorAtCreate);
-  console.log("Error at creation.");
+  console.log("Error at creation of topic.");
 }
 
 function loginRequest(userEmail, userPassword) {
@@ -252,18 +327,20 @@ function getTodayDate(){
   if (mm < 10) {
     mm = '0' + mm;
   }
-  var today = dd + '/' + mm + '/' + yyyy;
+  var today2 = dd + '-' + mm + '-' + yyyy;
+  console.log(today2);
+  return today2;
 }
 
 function createUserRequest(userEmail, userPassword){
   let url = `//localhost:8081/wenglish/users/post-user/`;
-  let userDate = Date.now();
+  let userDate = getTodayDate();
   let settings = {
     method : "POST",
     headers : {
       'Content-Type' : 'application/json'
     },
-    body : JSON.stringify({email : userEmail, password : userPassword, creationDate : "03-05-2019"})
+    body : JSON.stringify({email : userEmail, password : userPassword, creationDate : userDate})
   };
   console.log(settings);
   fetch(url,settings)
@@ -278,6 +355,30 @@ function createUserRequest(userEmail, userPassword){
   .then(responseJSON => {
     //TODO: There should be a Successfully created user
     loginUserFromCreateUser(responseJSON);
+  });
+}
+
+function createTopicRequest(userTopic, wordsToAdd, userEmail){
+  let url = "//localhost:8080/wenglish/topics/post-topic/";
+  let settings = {
+    method : "POST",
+    headers : {
+      'Content-Type' : 'application/json'
+    },
+    body : JSON.stringify({name: userTopic, words:wordsToAdd, creatorEmail: userEmail})
+  };
+  console.log(settings);
+  fetch(url,settings)
+  .then(response => {
+    if(response.ok){
+      return response.json();
+    } else {
+      unableToCreateTopic("alreadycreated");
+      throw new Error(response.statusText);
+    }
+  })
+  .then(responseJSON => {
+    unableToCreateTopic("creado");
   });
 }
 

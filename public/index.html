@@ -150,11 +150,50 @@
         <div id="user-info-box" class="card my-4" style="display:none;">
           <h5 id="user-info-email" class="card-header">Información de usuario</h5>
           <div class="card-body">
-            <div class="card-title"> Titulo de la card </div>
-            <div class="my-2"> Información extra sobre la persona loggeada </div>
-            <button id="user-info-logout" class="btn btn-secondary"> Log out </button>
+            <div class="my-2">
+              <span class="font-italic">Since:</span> <span id="user-info-since">Hace mucho</span>
+            </div>
+            <div class="my-2">
+              <a href="#"> Topics del usuario </a>
+            </div>
+            <div class="my-2">
+              <a href="#" data-toggle="modal" data-target="#createTopicModal"> Crear Topic </a>
+            </div>
+            <button id="user-info-logout" class="btn btn-secondary float-right"> Log out </button>
           </div>
         </div>
+
+        <!-- Modal para creacion de topics -->
+        <div class="modal fade" id="createTopicModal" tabindex="-1" role="dialog" aria-labelledby="creatTopicModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="creatTopicModalLabel">Creación Topic</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="create-topic-form">
+              <div class="modal-body">
+                <div id="create-topic-err"></div>
+                <div class="form-group my-2">
+                  <label for="create-topic-topicname">Nombre del Topic: </label>
+                  <input id="create-topic-topicname" type="text" class="form-control form-control-lg" placeholder="Ej. Naturaleza...">
+                </div>
+                <div class="form-group my-2">
+                  <label for="create-topic-words"> Escribe las palabras iniciales: </label>
+                  <textarea id="create-topic-words" class="form-control" rows="2" placeholder="Palabras separadas por comas. Ej: Tree, Ground, Mountain, etc..."></textarea>
+                  <small id="create-topic-help" class="form-text text-muted">Palabras separadas por comas. Ej: Tree, Ground, Mountain, etc...</small>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Crear Topic</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
 
         <!-- Search topics Widget -->
         <div id="search-topic-box" class="card my-4">

@@ -1,4 +1,5 @@
 const express = require('express');
+const uuidv4 = require('uuid/v4');
 const router = express.Router();
 const {topicsModel} = require('./topics-model');
 
@@ -96,7 +97,7 @@ router.get('/search-topics', (req, res, next) => {
 });
 
 router.post('/post-topic', (req, res, next) => {
-	let requiredFields = ['id', 'name', 'words', 'creatorEmail'];
+	let requiredFields = ['name', 'words', 'creatorEmail'];
 
 	for (let i = 0; i < requiredFields.length; i++) {
 		let currentField = requiredFields[i];
@@ -110,7 +111,7 @@ router.post('/post-topic', (req, res, next) => {
 	}
 
 	let topicToAdd = {
-		id: req.body.id,
+		id: uuidv4(),
 		name: req.body.name,
 		words: req.body.words,
 		creatorEmail: req.body.creatorEmail
@@ -275,7 +276,7 @@ router.put('/add-word/:id', (req, res, next) => {
 		res.status(406).json({
 			message : `Missing ID parameter`,
 			status : 406
-		});		
+		});
 	}
 });
 
@@ -322,7 +323,7 @@ router.delete('/remove-word/:id', (req, res, next) => {
 		res.status(406).json({
 			message : `Missing ID parameter`,
 			status : 406
-		});		
+		});
 	}
 });
 
@@ -352,14 +353,14 @@ router.delete('/remove-topic/:id', (req, res, next) => {
 							message : "Successfully deleted the topic",
 							status : 204,
 						});
-						return next();						
+						return next();
 					}
 					else {
 						res.status(404).json({
 							message : "Topic not found in the list",
 							status : 404
 						});
-						return next();						
+						return next();
 					}
 				})
 				.catch( err => {
