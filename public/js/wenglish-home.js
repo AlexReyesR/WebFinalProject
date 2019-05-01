@@ -63,6 +63,7 @@ $(".create-user").on("click", event => {
 $("#user-info-logout").on("click", event => {
   sessionStorage.UserLogged = false;
   sessionStorage.Username = null;
+  sessionStorage.Date = null;
   $("#login-box").show();
   $("#user-info-box").hide();
 });
@@ -177,6 +178,7 @@ function showRelatedWords(data) {
 
 function replaceLogin(){
   $("#user-info-email").text(sessionStorage.Username);
+  $("#user-info-since").text(sessionStorage.Date.substring(0,10));
   $("#login-box").hide();
   $("#create-user-box").hide();
   $("#user-info-box").show();
@@ -187,6 +189,7 @@ function loginUserFromJson(data) {
   console.log("Loggin in.");
   sessionStorage.UserLogged = true;
   sessionStorage.Username = data.userLogged.email;
+  sessionStorage.Date = data.userLogged.creationDate;
   replaceLogin();
 }
 
@@ -476,7 +479,7 @@ function showFoundTopics(data) {
                                     </div>  `);
     }
     else {
-      $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4"> 
+      $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4">
                                           <div class="card-body">
                                             <h2 class="card-title">${data.topics[i].name}</h2>
                                             Palabras en este tópico:
