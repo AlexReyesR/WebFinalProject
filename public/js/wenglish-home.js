@@ -2,8 +2,31 @@ const spanishKey = "c47cfc8c-fb4f-4f05-9a5c-8ca50a95ed45";
 const learnerKey="a918126f-e9e9-4916-9b12-53cbcba2e97a";
 const thesaurusKey = "a414d322-2ba5-458e-80a1-8fc3c994dedd";
 
+$(".translate-button").on("click", event => {
+  let translationText = $("#translate-input").val();
+  findTranslation(translationText, showTranslation);
+});
+
+function findTranslation(wordToTranslate, callback){
+  $.ajax({
+    url : `https://www.dictionaryapi.com/api/v3/references/spanish/json/${wordToTranslate}?key=${spanishKey}`,
+    method : "GET",
+    dataType : "json",
+    success : responseJson => callback(responseJson),
+    error : err => console.log(err)
+  });
+}
+
 function showTranslation(data) {
-  $("#translation-result-text").html(data[0].shortdef);
+  $("#translation-result-text").html(`  <div>
+                                            Traducción(es):
+                                          </div>`);
+  
+  data[0].shortdef.forEach(item => {
+  $("#translation-result-text").append(`  <li>
+                                              ${item}
+                                            </li>`);
+  })
   $("#translation-result").collapse("show");
 
   let firstDef = data[0].shortdef[0];
@@ -24,22 +47,69 @@ function showTranslation(data) {
   translatedText = translatedText.replace( /[^a-zA-Z]/ , "");
   
   console.log(translatedText);
+
+  findDefinition(translatedText, showDefinition);
 }
 
-function findTranslation(wordToTranslate, callback){
+function findDefinition(englishWord, callback) {
   $.ajax({
-    url : `https://www.dictionaryapi.com/api/v3/references/spanish/json/${wordToTranslate}?key=${spanishKey}`,
+    url : `https://www.dictionaryapi.com/api/v3/references/learners/json/${englishWord}?key=${learnerKey}`,
+    method : "GET",
+    dataType : "json",
+    success : responseJson => callback(responseJson , englishWord),
+    error : err => console.log(err)
+  });  
+}
+
+function showDefinition(data, englishWord) {
+  let firstDef = data[0].shortdef[0];
+  firstDef = firstDef.charAt(0).toUpperCase() + firstDef.slice(1) + ".";
+
+  $("#translation-result-text").append(`  <div class = "translationResultSection">
+                                            Definición:
+                                          </div>`);
+  $("#translation-result-text").append(`  <li>
+                                            ${firstDef}
+                                          </li>`);
+  
+  console.log("Learner definition:");
+  console.log(firstDef);
+
+  findRelatedWords(englishWord, showRelatedWords);
+}
+
+function findRelatedWords(englishWord, callback) {
+    $.ajax({
+    url : `https://www.dictionaryapi.com/api/v3/references/thesaurus/json/${englishWord}?key=${thesaurusKey}`,
     method : "GET",
     dataType : "json",
     success : responseJson => callback(responseJson),
     error : err => console.log(err)
-  });
+  }); 
 }
 
-$(".translate-button").on("click", event => {
-  let translationText = $("#translate-input").val();
-  findTranslation(translationText, showTranslation);
-});
+function showRelatedWords(data) {
+  let firstSyns;
+  if(data[0].meta) {
+    firstSyns = data[0].meta.syns[0];
+  }
+  else {
+    firstSyns = data;
+  }
+
+  $("#translation-result-text").append(`  <div class = "translationResultSection">
+                                            Palabras relacionadas:
+                                          </div>`);
+  
+  firstSyns.forEach(item => {
+    $("#translation-result-text").append(`  <li>
+                                              ${item}
+                                            </li>`);    
+  })
+
+  console.log("Synonyms:");
+  console.log(firstSyns);
+}
 
 $(".create-user").on("click", event => {
   $("#create-user-box").collapse("toggle");
