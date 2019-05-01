@@ -15,8 +15,6 @@ $("#user-info-logout").on("click", event => {
   $("#user-info-box").hide();
 });
 
-let usersDB;
-
 function replaceLogin(){
   $("#user-info-email").text(sessionStorage.Username);
   $("#login-box").hide();
