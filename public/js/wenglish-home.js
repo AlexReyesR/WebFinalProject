@@ -71,10 +71,11 @@ $("#user-info-logout").on("click", event => {
 
 $("#found-topics-list").on("click", '.found-topic-deleteBtn', function(event){
     let idToDelete = $(this).parent().children().first().text();
-    console.log(idToDelete);
+    //console.log(idToDelete);
     $("#delete-topic-confirm").unbind("click");
     $("#delete-topic-confirm").on("click", event => {
-      console.log(`ID: ${idToDelete}`);
+      //console.log(`ID: ${idToDelete}`);
+      $("#delete-topic-response > .alert").remove();
       deleteTopicRequest(idToDelete);
     });
 });
@@ -85,8 +86,12 @@ $("#found-topics-list").on("click", ".found-topic-chNameBtn",function(event) {
     $("#changeName-confirm").unbind("click");
     $("#changeName-confirm").on("click", event => {
       let newName = $("#changeName-topicname").val();
-      console.log(`Name: ${newName}`);
-      changeNameRequest(idToEdit, newName);
+      //console.log(`Name: ${newName}`);
+      $("#edit-topic-err > .alert").remove();
+      if(newName != "")
+        changeNameRequest(idToEdit, newName);
+      else
+        responseOfChangeName("vacio");
     });
 });
 
@@ -95,8 +100,12 @@ $("#found-topics-list").on("click", ".found-topic-addWordBtn", function(event) {
   $("#addWord-confirm").unbind("click");
   $("#addWord-confirm").on("click", event => {
     let wordToAdd = $("#addWord-newWord").val();
-      console.log(`Name: ${wordToAdd}`);
+      //console.log(`Name: ${wordToAdd}`);
+      $("#add-word-response > .alert").remove();
+    if(wordToAdd != "")
       addWordRequest(idToEdit, wordToAdd);
+    else
+      responseOfAddWord("vacio");
   });
 });
 
@@ -105,8 +114,12 @@ $("#found-topics-list").on("click", ".found-topic-deleteWordBtn", function(event
   $("#deleteWord-confirm").unbind("click");
   $("#deleteWord-confirm").on("click", event => {
     let wordToDelete = $("#deleteWord-newWord").val();
-      console.log(`Name: ${wordToDelete}`);
+      //console.log(`Name: ${wordToDelete}`);
+      $("#delete-word-response > .alert").remove();
+    if(wordToDelete != "")
       deleteWordRequest(idToEdit, wordToDelete);
+    else
+      responseOfDeleteWord("vacio");
   });
 });
 
@@ -295,6 +308,13 @@ function unableToCreateTopic(string){
       </button>
     </div>`;
     $("#create-topic-form").trigger('reset');
+    if(window.location.pathname == "/perfil.html"){
+      //Desplegar los topics del usuario filtrados
+      $(getTopicsFromUser(sessionStorage.Username));
+    }
+    else {
+      $(getAllTopics);
+    }
   }
 
   $("#create-topic-err").append(errorAtCreate);
@@ -439,14 +459,38 @@ function deleteTopicRequest(topicId){
     .then(response => {
       if (response.ok) {
         //console.log(`Response: ${response}`);
+        responseOfDeleteTopic("success");
         return response.json();
       } else {
         if (response.statusText == "Not Found") {
-          //showNotFoundTopics();
+          responseOfDeleteTopic("notfound");
         }
         throw new Error(response.statusText);
       }
     });
+}
+
+function responseOfDeleteTopic(string){
+  let errorAtCreate = "";
+  if(string == "notfound"){
+    errorAtCreate = `
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> <br/> El id del topic no existe...?
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+  } else if(string == "success"){
+    errorAtCreate = `
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Listo!</strong> <br/> El topic ha sido eliminado
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+    $(getTopicsFromUser(sessionStorage.Username));
+  }
+  $("#delete-topic-response").append(errorAtCreate);
 }
 
 function changeNameRequest(topicId, newName){
@@ -465,14 +509,55 @@ function changeNameRequest(topicId, newName){
     .then(response => {
       if (response.ok) {
         //console.log(`Response: ${response}`);
+        responseOfChangeName("success");
         return response.json();
       } else {
         if (response.statusText == "Not Found") {
-          //showNotFoundTopics();
+          responseOfChangeName("notfound");
         }
+        responseOfChangeName("existe");
         throw new Error(response.statusText);
       }
     });
+}
+
+function responseOfChangeName(string){
+  let errorAtCreate = "";
+  if(string == "vacio"){
+    errorAtCreate = `
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Nombre vacío!</strong> <br/> Por favor ingresa un nombre para el topic
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+  } else if(string == "notfound"){
+    errorAtCreate = `
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> <br/> El id del topic no existe en la Base de datos.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+  } else if(string == "existe"){
+    errorAtCreate = `
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Nombre ya usado!</strong> <br/> Por favor elige otro nombre para tu Topic.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+  } else if(string == "success"){
+    errorAtCreate = `
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Listo!</strong> <br/> El nombre del topic ha sido cambiado.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+      $(getTopicsFromUser(sessionStorage.Username));
+  }
+  $("#edit-topic-err").prepend(errorAtCreate);
 }
 
 function addWordRequest(topicId, newWord){
@@ -491,14 +576,77 @@ function addWordRequest(topicId, newWord){
     .then(response => {
       if (response.ok) {
         //console.log(`Response: ${response}`);
+        responseOfAddWord("success");
         return response.json();
       } else {
         if (response.statusText == "Not Found") {
+          responseOfAddWord("notfound");
           //showNotFoundTopics();
         }
         throw new Error(response.statusText);
       }
     });
+}
+
+function responseOfAddWord(string){
+  let errorAtCreate = "";
+  if(string == "vacio"){
+    errorAtCreate = `
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Palabra vacía!</strong> <br/> Por favor ingresa una palabra para agregar
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+  } else if(string == "success"){
+    errorAtCreate = `
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Listo!</strong> <br/> La palabra ha sido agregada.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+    $(getTopicsFromUser(sessionStorage.Username));
+  } else if(string == "notfound"){
+    errorAtCreate = `
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> <br/> El id del topic no existe en la Base de datos.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+  }
+  $("#add-word-response").prepend(errorAtCreate);
+}
+
+function responseOfDeleteWord(string){
+  if(string == "vacio"){
+    errorAtCreate = `
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Palabra vacía!</strong> <br/> Por favor ingresa una palabra para eliminar
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+  } else if(string == "success"){
+    errorAtCreate = `
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Listo!</strong> <br/> La palabra ha sido eliminada.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+    $(getTopicsFromUser(sessionStorage.Username));
+  } else if(string == "notfound"){
+    errorAtCreate = `
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> <br/> El id del topic no existe en la Base de datos.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`;
+  }
+  $("#delete-word-response").prepend(errorAtCreate);
 }
 
 function deleteWordRequest(topicId, received_word){
@@ -517,9 +665,11 @@ function deleteWordRequest(topicId, received_word){
     .then(response => {
       if (response.ok) {
         //console.log(`Response: ${response}`);
+        responseOfDeleteWord("success");
         return response.json();
       } else {
         if (response.statusText == "Not Found") {
+          responseOfDeleteWord("notfound");
           //showNotFoundTopics();
         }
         throw new Error(response.statusText);
@@ -688,7 +838,7 @@ function showProfileTopics(data) {
                                             <ul class="card-text">
                                               ${listed_words}
                                             </ul>
-                                            <button class="found-topic-deleteBtn btn btn-danger float-right" data-toggle="modal" data-target="#deleteTopicModal"> Eliminar </button>
+                                            <button class="found-topic-deleteBtn btn btn-danger float-right" data-toggle="modal" data-target="#deleteTopicModal"> Eliminar tópico</button>
                                             <button class="found-topic-chNameBtn mr-3 btn btn-warning float-left" data-toggle="modal" data-target="#editNameModal"> Cambiar nombre </button>
                                             <button class="found-topic-addWordBtn mr-3 btn btn-warning float-left" data-toggle="modal" data-target="#addWordModal"> Agregar palabra</button>
                                             <button class="found-topic-deleteWordBtn mr-3 btn btn-danger float-right" data-toggle="modal" data-target="#deleteWordModal"> Eliminar palabra</button>
