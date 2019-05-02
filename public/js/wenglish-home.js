@@ -71,11 +71,43 @@ $("#user-info-logout").on("click", event => {
 
 $("#found-topics-list").on("click", '.found-topic-deleteBtn', function(event){
     let idToDelete = $(this).parent().children().first().text();
-    deleteTopicRequest(idToDelete);
-  });
-$("#found-topics-list").on("click", ".found-topic-editBtn",function(event) {
+    console.log(idToDelete);
+    $("#delete-topic-confirm").unbind("click");
+    $("#delete-topic-confirm").on("click", event => {
+      console.log(`ID: ${idToDelete}`);
+      deleteTopicRequest(idToDelete);
+    });
+});
+
+$("#found-topics-list").on("click", ".found-topic-chNameBtn",function(event) {
     let idToEdit = $(this).parent().children().first().text();
-    editTopicRequest(idToDelete);
+    console.log(`ID: ${idToEdit}`);
+    $("#changeName-confirm").unbind("click");
+    $("#changeName-confirm").on("click", event => {
+      let newName = $("#changeName-topicname").val();
+      console.log(`Name: ${newName}`);
+      changeNameRequest(idToEdit, newName);
+    });
+});
+
+$("#found-topics-list").on("click", ".found-topic-addWordBtn", function(event) {
+  let idToEdit = $(this).parent().children().first().text();
+  $("#addWord-confirm").unbind("click");
+  $("#addWord-confirm").on("click", event => {
+    let wordToAdd = $("#addWord-newWord").val();
+      console.log(`Name: ${wordToAdd}`);
+      addWordRequest(idToEdit, wordToAdd);
+  });
+});
+
+$("#found-topics-list").on("click", ".found-topic-deleteWordBtn", function(event) {
+  let idToEdit = $(this).parent().children().first().text();
+  $("#deleteWord-confirm").unbind("click");
+  $("#deleteWord-confirm").on("click", event => {
+    let wordToDelete = $("#deleteWord-newWord").val();
+      console.log(`Name: ${wordToDelete}`);
+      deleteWordRequest(idToEdit, wordToDelete);
+  });
 });
 
 function stringToWordsArray(string){
@@ -392,12 +424,107 @@ function createTopicRequest(userTopic, wordsToAdd, userEmail){
 
 //Agarrar del modal abierto de delete, el id del boton para confirmar. Si confirma pasar al endpoint el id y eliminarlo de la BD
 function deleteTopicRequest(topicId){
+  let url = `//localhost:8080/wenglish/topics/remove-topic/${topicId}`;
 
+  //console.log(`Search word: ${search_word}`);
+  let settings = {
+    method : "DELETE",
+    headers : {
+      'Content-Type' : 'application/json'
+    },
+    body : JSON.stringify({id : topicId})
+  }
+
+  fetch(url, settings)
+    .then(response => {
+      if (response.ok) {
+        //console.log(`Response: ${response}`);
+        return response.json();
+      } else {
+        if (response.statusText == "Not Found") {
+          //showNotFoundTopics();
+        }
+        throw new Error(response.statusText);
+      }
+    });
 }
 
-//Agarrar del modal abierto de edit, los campos nuevos y con el id que trae esta funcion llamar al endopoint y editarlo
-function editTopicRequest(topicId){
+function changeNameRequest(topicId, newName){
+  let url = `//localhost:8080/wenglish/topics/update-name/${topicId}`;
 
+  //console.log(`Search word: ${search_word}`);
+  let settings = {
+    method : "PUT",
+    headers : {
+      'Content-Type' : 'application/json'
+    },
+    body : JSON.stringify({name : newName})
+  }
+
+  fetch(url, settings)
+    .then(response => {
+      if (response.ok) {
+        //console.log(`Response: ${response}`);
+        return response.json();
+      } else {
+        if (response.statusText == "Not Found") {
+          //showNotFoundTopics();
+        }
+        throw new Error(response.statusText);
+      }
+    });
+}
+
+function addWordRequest(topicId, newWord){
+  let url = `//localhost:8080/wenglish/topics/add-word/${topicId}`;
+
+  //console.log(`Search word: ${search_word}`);
+  let settings = {
+    method : "PUT",
+    headers : {
+      'Content-Type' : 'application/json'
+    },
+    body : JSON.stringify({word : newWord})
+  }
+
+  fetch(url, settings)
+    .then(response => {
+      if (response.ok) {
+        //console.log(`Response: ${response}`);
+        return response.json();
+      } else {
+        if (response.statusText == "Not Found") {
+          //showNotFoundTopics();
+        }
+        throw new Error(response.statusText);
+      }
+    });
+}
+
+function deleteWordRequest(topicId, received_word){
+  let url = `//localhost:8080/wenglish/topics/remove-word/${topicId}`;
+
+  //console.log(`Search word: ${search_word}`);
+  let settings = {
+    method : "DELETE",
+    headers : {
+      'Content-Type' : 'application/json'
+    },
+    body : JSON.stringify({word : received_word})
+  }
+
+  fetch(url, settings)
+    .then(response => {
+      if (response.ok) {
+        //console.log(`Response: ${response}`);
+        return response.json();
+      } else {
+        if (response.statusText == "Not Found") {
+          //showNotFoundTopics();
+        }
+        throw new Error(response.statusText);
+      }
+    });
 }
 
 function initializeUsers(){
@@ -541,8 +668,10 @@ function showProfileTopics(data) {
                                         <ul class="card-text ">
                                           ${listed_words}
                                         </ul>
-                                        <button class="found-topic-deleteBtn btn btn-danger float-right" data-toggle="modal" data-target="#deleteTopicModal"> Delete </button>
-                                        <button class="found-topic-editBtn mr-3 btn btn-warning float-right" data-toggle="modal" data-target="#editTopicModal"> Edit </button>
+                                        <button class="found-topic-deleteBtn btn btn-danger float-right" data-toggle="modal" data-target="#deleteTopicModal"> Eliminar tópico</button>
+                                        <button class="found-topic-chNameBtn mr-3 btn btn-warning float-left" data-toggle="modal" data-target="#editNameModal"> Cambiar nombre </button>
+                                        <button class="found-topic-addWordBtn mr-3 btn btn-warning float-left" data-toggle="modal" data-target="#addWordModal"> Agregar palabra</button>
+                                        <button class="found-topic-deleteWordBtn mr-3 btn btn-danger float-right" data-toggle="modal" data-target="#deleteWordModal"> Eliminar palabra</button>
                                       </div>
                                       <div class="card-footer text-muted">
                                         Tópico creado por:
@@ -559,8 +688,10 @@ function showProfileTopics(data) {
                                             <ul class="card-text">
                                               ${listed_words}
                                             </ul>
-                                            <button class="found-topic-deleteBtn btn btn-danger float-right" data-toggle="modal" data-target="#deleteTopicModal"> Delete </button>
-                                            <button class="found-topic-editBtn mr-3 btn btn-warning float-right" data-toggle="modal" data-target="#editTopicModal"> Edit </button>
+                                            <button class="found-topic-deleteBtn btn btn-danger float-right" data-toggle="modal" data-target="#deleteTopicModal"> Eliminar </button>
+                                            <button class="found-topic-chNameBtn mr-3 btn btn-warning float-left" data-toggle="modal" data-target="#editNameModal"> Cambiar nombre </button>
+                                            <button class="found-topic-addWordBtn mr-3 btn btn-warning float-left" data-toggle="modal" data-target="#addWordModal"> Agregar palabra</button>
+                                            <button class="found-topic-deleteWordBtn mr-3 btn btn-danger float-right" data-toggle="modal" data-target="#deleteWordModal"> Eliminar palabra</button>
                                           </div>
                                           <div class="card-footer text-muted">
                                             Tópico creado por:
