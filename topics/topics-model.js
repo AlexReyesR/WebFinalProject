@@ -21,8 +21,8 @@ const topicsModel = {
 			});
 	},
 
-	get_with_id : function(received_id) {
-		return Topics.findOne({id : received_id})
+	get_with_email : function(received_email) {
+		return Topics.find({creatorEmail : received_email})
 			.then(topics => {
 				return topics;
 			})

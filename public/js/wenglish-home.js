@@ -68,6 +68,16 @@ $("#user-info-logout").on("click", event => {
   $("#user-info-box").hide();
 });
 
+
+$("#found-topics-list").on("click", '.found-topic-deleteBtn', function(event){
+    let idToDelete = $(this).parent().children().first().text();
+    deleteTopicRequest(idToDelete);
+  });
+$("#found-topics-list").on("click", ".found-topic-editBtn",function(event) {
+    let idToEdit = $(this).parent().children().first().text();
+    editTopicRequest(idToDelete);
+});
+
 function stringToWordsArray(string){
   let array = string.split(/[\s,]+/);
   if(string.search(';') < 0 || string.search('.') < 0 || string.search(':') < 0)
@@ -140,9 +150,6 @@ function showDefinition(data, englishWord) {
                                             ${firstDef}
                                           </li>`);
 
-  //console.log("Learner definition:");
-  //console.log(firstDef);
-
   findRelatedWords(englishWord, showRelatedWords);
 }
 
@@ -197,6 +204,7 @@ function loginUserFromCreateUser(data){
   console.log("Loggin in.");
   sessionStorage.UserLogged = true;
   sessionStorage.Username = data.user.email;
+  sessionStorage.Date = data.userLogged.creationDate;
   replaceLogin();
 }
 
@@ -382,6 +390,16 @@ function createTopicRequest(userTopic, wordsToAdd, userEmail){
   });
 }
 
+//Agarrar del modal abierto de delete, el id del boton para confirmar. Si confirma pasar al endpoint el id y eliminarlo de la BD
+function deleteTopicRequest(topicId){
+
+}
+
+//Agarrar del modal abierto de edit, los campos nuevos y con el id que trae esta funcion llamar al endopoint y editarlo
+function editTopicRequest(topicId){
+
+}
+
 function initializeUsers(){
   //Check in session storage if an user is already logged
   let isUserLogged = sessionStorage.UserLogged;
@@ -445,18 +463,26 @@ function searchTopics(search_word) {
     });
 }
 
-function showNotFoundTopics() {
-  $("#found-topics-list").html(`<div class="topic-info card mb-4 my-4">
-                                  <div class="card-body">
-                                    <h2 class="card-title">Tópico no encontrado</h2>
-                                    <p class="card-text"> La búsqueda realizada no concuerda con ningún tópico existente. ¡Sé el primero en crearlo!</p>
-                                  </div>
-                                </div>`);
+function showNotFoundTopics(string) {
+  if(string == "perfil"){
+    $("#found-topics-list").html(`<div class="topic-info card mb-4 my-4">
+                                    <div class="card-body">
+                                      <h2 class="card-title">Perfil sin Topics</h2>
+                                      <p class="card-text"> No has creado ningun Topic. ¿Por qué no creas uno ahora? :)</p>
+                                    </div>
+                                  </div>`);
+  } else {
+    $("#found-topics-list").html(`<div class="topic-info card mb-4 my-4">
+                                    <div class="card-body">
+                                      <h2 class="card-title">Tópico no encontrado</h2>
+                                      <p class="card-text"> La búsqueda realizada no concuerda con ningún tópico existente. ¡Sé el primero en crearlo!</p>
+                                    </div>
+                                  </div>`);
+  }
 }
 
 function showFoundTopics(data) {
 
-  console.log(data.topics);
   let listed_words;
   for (let i = 0; i < data.topics.length; i++) {
     listed_words = "";
@@ -467,9 +493,6 @@ function showFoundTopics(data) {
     if (i == 0) {
       $("#found-topics-list").html(` <div class="topic-info card mb-4 my-4">
                                       <div class="card-body">
-                                        <span class="hiddenSpan" style="display:none">
-                                            ${data.topics[i].id}
-                                        </span>
                                         <h2 class="card-title">${data.topics[i].name}</h2>
                                         Palabras en este tópico:
                                         <ul class="card-text ">
@@ -485,14 +508,59 @@ function showFoundTopics(data) {
     else {
       $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4">
                                           <div class="card-body">
-                                            <span class="hiddenSpan" style="display:none">
-                                              ${data.topics[i].id}
-                                            </span>
                                             <h2 class="card-title">${data.topics[i].name}</h2>
                                             Palabras en este tópico:
                                             <ul class="card-text">
                                               ${listed_words}
                                             </ul>
+                                          </div>
+                                          <div class="card-footer text-muted">
+                                            Tópico creado por:
+                                            <span class="topic-author-span"> ${data.topics[i].creatorEmail} </span>
+                                          </div>
+                                        </div>`);
+    }
+  }
+}
+
+function showProfileTopics(data) {
+
+  let listed_words;
+  for (let i = 0; i < data.topics.length; i++) {
+    listed_words = "";
+    for (let j = 0; j < data.topics[i].words.length; j++) {
+      listed_words += ` <li> ${data.topics[i].words[j]} </li>`
+    }
+
+    if (i == 0) {
+      $("#found-topics-list").html(` <div class="topic-info card mb-4 my-4">
+                                      <div class="card-body">
+                                        <span class="hiddenSpan" style="display:none">${data.topics[i].id}</span>
+                                        <h2 class="card-title">${data.topics[i].name}</h2>
+                                        Palabras en este tópico:
+                                        <ul class="card-text ">
+                                          ${listed_words}
+                                        </ul>
+                                        <button class="found-topic-deleteBtn btn btn-danger float-right" data-toggle="modal" data-target="#deleteTopicModal"> Delete </button>
+                                        <button class="found-topic-editBtn mr-3 btn btn-warning float-right" data-toggle="modal" data-target="#editTopicModal"> Edit </button>
+                                      </div>
+                                      <div class="card-footer text-muted">
+                                        Tópico creado por:
+                                        <span class="topic-author-span"> ${data.topics[i].creatorEmail} </span>
+                                      </div>
+                                    </div>  `);
+    }
+    else {
+      $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4">
+                                          <div class="card-body">
+                                            <span class="hiddenSpan" style="display:none">${data.topics[i].id}</span>
+                                            <h2 class="card-title">${data.topics[i].name}</h2>
+                                            Palabras en este tópico:
+                                            <ul class="card-text">
+                                              ${listed_words}
+                                            </ul>
+                                            <button class="found-topic-deleteBtn btn btn-danger float-right" data-toggle="modal" data-target="#deleteTopicModal"> Delete </button>
+                                            <button class="found-topic-editBtn mr-3 btn btn-warning float-right" data-toggle="modal" data-target="#editTopicModal"> Edit </button>
                                           </div>
                                           <div class="card-footer text-muted">
                                             Tópico creado por:
@@ -525,6 +593,30 @@ function getAllTopics(){
   });
 }
 
+function getTopicsFromUser(username){
+  let url = `//localhost:8080/wenglish/topics/list-topics/${username}`;
+  let settings = {
+    method : "GET",
+    headers : {
+      'Content-Type' : 'application/json'
+    }
+  };
+  fetch(url,settings)
+  .then(response => {
+    if(response.ok){
+      return response.json();
+    } else {
+      if (response.statusText == "Not Found") {
+        showNotFoundTopics("perfil");
+      }
+      throw new Error(response.statusText);
+    }
+  })
+  .then(responseJSON => {
+    showProfileTopics(responseJSON);
+  });
+}
+
 function showRecentTopics(data) {
   //console.log(data.topics.length);
   let listed_words;
@@ -534,11 +626,8 @@ function showRecentTopics(data) {
       listed_words += ` <li> ${data.topics[i].words[j]} </li>`
     }
 
-    $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4"> 
+    $("#found-topics-list").append(`  <div class="topic-info card mb-4 my-4">
                                         <div class="card-body">
-                                          <span class="hiddenSpan" style="display:none">
-                                            ${data.topics[i].id}
-                                          </span>
                                           <h2 class="card-title">${data.topics[i].name}</h2>
                                           Palabras en este tópico:
                                           <ul class="card-text">
@@ -555,4 +644,11 @@ function showRecentTopics(data) {
 
 $(initializeUsers);
 $(checkIfLogged);
-$(getAllTopics);
+
+if(window.location.pathname == "/perfil.html"){
+  //Desplegar los topics del usuario filtrados
+  $(getTopicsFromUser(sessionStorage.Username));
+}
+else {
+  $(getAllTopics);
+}

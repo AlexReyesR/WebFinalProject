@@ -28,11 +28,11 @@ router.get('/list-topics', (req, res, next) => {
 		});
 });
 
-router.get('/list-topics/:id', (req, res, next) => {
-	let received_id = req.params.id;
-	topicsModel.get_with_id(received_id)
+router.get('/list-topics/:email', (req, res, next) => {
+	let received_email = req.params.email;
+	topicsModel.get_with_email(received_email)
 		.then( topics => {
-			if(topics) {
+			if(topics.length > 0) {
 				res.status(200).json({
 					message: "Successfully sent the list of topics",
 					status : 200,
@@ -56,7 +56,7 @@ router.get('/list-topics/:id', (req, res, next) => {
 });
 
 router.get('/search-topics/:word', (req, res, next) => {
-	
+
 	if(req.params.word) {
 		topicsModel.get_search(req.params.word)
 		.then(topics => {
