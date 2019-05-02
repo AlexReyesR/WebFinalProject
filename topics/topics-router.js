@@ -311,6 +311,7 @@ router.delete('/remove-word/:id', (req, res, next) => {
 				}
 			})
 			.catch(err => {
+				console.log(err);
 				res.status(500).json({
 					message: "Internal server error",
 					status : 500

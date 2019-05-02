@@ -18,3 +18,19 @@ body {
     bottom: 0;
     width: 100%;
 }
+
+#contactOnAbout h5{
+	background-color : #daefd0;
+}
+
+#contactOnAbout .card-body {
+	background-color: #fcfff4;
+}
+/*
+#wenglishInfo h5{
+	background-color : #daefd0;
+}
+
+#wenglishInfo .card-body {
+	background-color : #f5fff4;
+}*/

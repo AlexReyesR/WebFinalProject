@@ -74,6 +74,7 @@ const topicsModel = {
 
 	add_word : function(received_id, received_word) {
 		var words_array = [];
+		console.log(`Received id: ${received_id}`);
 		return Topics.findOne({id : received_id})
 			.then(topic => {
 				words_array = topic.words;
